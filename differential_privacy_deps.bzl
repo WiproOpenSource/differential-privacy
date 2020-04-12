@@ -90,12 +90,24 @@ def differential_privacy_deps():
             remote = "https://github.com/bazelbuild/rules_foreign_cc.git",
         )
 
-    # Postgres depends on rules_foreign_cc.
+    # # Postgres depends on rules_foreign_cc.
+    # if not native.existing_rule("postgres"):
+    #     new_git_repository(
+    #         name = "postgres",
+    #         # 2019-08-16 stable version 11.
+    #         commit = "a8423a99122bae8e90a3874a4466c39031657a55",
+    #         #commit = "aed967d697de19a78a653926c72604f9b04c3b1e",
+    #         #remote = "https://github.com/postgres/postgres/",
+    #         remote = "https://github.com/postgres/postgres.git",
+    #         build_file = "@com_google_differential_privacy//differential_privacy/postgres:postgres.BUILD",
+    #     )
+
+ # Postgres depends on rules_foreign_cc
     if not native.existing_rule("postgres"):
-        new_git_repository(
+        http_archive(
             name = "postgres",
-            # 2019-08-16 stable version 11.
-            commit = "aed967d697de19a78a653926c72604f9b04c3b1e",
-            remote = "https://github.com/postgres/postgres/",
+            type = "tar.gz",
+            url = "https://github.com/postgres/postgres/archive/REL_11_7.tar.gz",
+            strip_prefix = "postgres-REL_11_7",
             build_file = "@com_google_differential_privacy//differential_privacy/postgres:postgres.BUILD",
         )
