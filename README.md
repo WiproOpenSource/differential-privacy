@@ -48,6 +48,21 @@ extension, for example on Ubuntu you will need these packages:
 
 ```sudo apt-get install libreadline-dev bison flex```
 
+## How run the dockersized GDP
+ 
+This is experimental and we are working on few TODOs to drop the build time. 
+
+To build the base docker image  
+
+'''./run_docker_build.sh'''
+
+To run the exammple using 
+'''./run_dockerized_example.sh'''
+
+To run the tests
+'''./run_dockerized_tests.sh'''
+
+
 ## How to Use
 
 Full documentation on how to use the library is in the
