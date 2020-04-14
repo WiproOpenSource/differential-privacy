@@ -56,7 +56,7 @@ To build the base docker image
 
 ```./run_docker_build.sh```
 
-To run the exammple using 
+To run the example 
 
 ```./run_dockerized_example.sh```
 
