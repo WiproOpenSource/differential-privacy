@@ -64,13 +64,14 @@ def differential_privacy_deps():
     )
 
     # BoringSSL for cryptographic PRNG
-    git_repository(
-        name = "boringssl",
-        # 2019-07-10
-        commit = "776d803ffbb857b3a67c4ec14b671ff2b3ee65d2",
-        remote = "https://boringssl.googlesource.com/boringssl",
-        shallow_since = "1562793714 +0000",
-    )
+    if not native.existing_rule("boringssl"):
+        git_repository(
+            name = "boringssl",
+            # 2019-07-10
+            commit = "776d803ffbb857b3a67c4ec14b671ff2b3ee65d2",
+            remote = "https://boringssl.googlesource.com/boringssl",
+            # shallow_since = "1562793714 +0000",
+        )
 
     # Supports `./configure && make` style packages to become dependencies.
     http_archive(
