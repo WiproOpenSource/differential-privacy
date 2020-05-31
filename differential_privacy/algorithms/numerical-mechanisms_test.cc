@@ -26,12 +26,14 @@ namespace {
 using testing::_;
 using testing::DoubleEq;
 using testing::DoubleNear;
+using testing::Eq;
 using testing::Ge;
+using testing::MatchesRegex;
 using testing::Return;
 
 class MockLaplaceDistribution : public internal::LaplaceDistribution {
  public:
-  MockLaplaceDistribution() : internal::LaplaceDistribution(1.0) {}
+  MockLaplaceDistribution() : internal::LaplaceDistribution(1.0, 1.0) {}
   MOCK_METHOD1(Sample, double(double));
 };
 
@@ -48,6 +50,62 @@ TYPED_TEST(NumericalMechanismsTest, LaplaceBuilder) {
 
   EXPECT_DOUBLE_EQ(test_mechanism->GetEpsilon(), 1);
   EXPECT_DOUBLE_EQ(test_mechanism->GetSensitivity(), 3);
+}
+
+TEST(NumericalMechanismsTest, LaplaceBuilderFailsEpsilonNotSet) {
+  LaplaceMechanism::Builder test_builder;
+  auto failed_build = test_builder.SetL1Sensitivity(1).Build();
+  EXPECT_THAT(failed_build.status().code(),
+              Eq(base::StatusCode::kInvalidArgument));
+  // Convert message to std::string so that the matcher works in the open source
+  // version.
+  std::string message(std::string(failed_build.status().message()));
+  EXPECT_THAT(message, MatchesRegex("^Epsilon has to be set.*"));
+}
+
+TEST(NumericalMechanismsTest, LaplaceBuilderFailsEpsilonZero) {
+  LaplaceMechanism::Builder test_builder;
+  auto failed_build = test_builder.SetL1Sensitivity(1).SetEpsilon(0).Build();
+  EXPECT_THAT(failed_build.status().code(),
+              Eq(base::StatusCode::kInvalidArgument));
+  // Convert message to std::string so that the matcher works in the open source
+  // version.
+  std::string message(std::string(failed_build.status().message()));
+  EXPECT_THAT(message, MatchesRegex("^Epsilon has to be positive.*"));
+}
+
+TEST(NumericalMechanismsTest, LaplaceBuilderFailsEpsilonNegative) {
+  LaplaceMechanism::Builder test_builder;
+  auto failed_build = test_builder.SetL1Sensitivity(1).SetEpsilon(-1).Build();
+  EXPECT_THAT(failed_build.status().code(),
+              Eq(base::StatusCode::kInvalidArgument));
+  // Convert message to std::string so that the matcher works in the open source
+  // version.
+  std::string message(std::string(failed_build.status().message()));
+  EXPECT_THAT(message, MatchesRegex("^Epsilon has to be positive.*"));
+}
+
+TEST(NumericalMechanismsTest, LaplaceBuilderFailsEpsilonNan) {
+  LaplaceMechanism::Builder test_builder;
+  auto failed_build = test_builder.SetL1Sensitivity(1).SetEpsilon(NAN).Build();
+  EXPECT_THAT(failed_build.status().code(),
+              Eq(base::StatusCode::kInvalidArgument));
+  // Convert message to std::string so that the matcher works in the open source
+  // version.
+  std::string message(std::string(failed_build.status().message()));
+  EXPECT_THAT(message, MatchesRegex("^Epsilon has to be finite.*"));
+}
+
+TEST(NumericalMechanismsTest, LaplaceBuilderFailsEpsilonInfinity) {
+  LaplaceMechanism::Builder test_builder;
+  auto failed_build =
+      test_builder.SetL1Sensitivity(1).SetEpsilon(INFINITY).Build();
+  EXPECT_THAT(failed_build.status().code(),
+              Eq(base::StatusCode::kInvalidArgument));
+  // Convert message to std::string so that the matcher works in the open source
+  // version.
+  std::string message(std::string(failed_build.status().message()));
+  EXPECT_THAT(message, MatchesRegex("^Epsilon has to be finite.*"));
 }
 
 TYPED_TEST(NumericalMechanismsTest, LaplaceBuilderSensitivityTooHigh) {
@@ -150,6 +208,5 @@ TEST(NumericalMechanismsTest, LaplaceEstimatesL1WithL0AndLInf) {
                                                     .ValueOrDie();
   EXPECT_THAT(mechanism->GetSensitivity(), Ge(3));
 }
-
 }  // namespace
 }  // namespace differential_privacy

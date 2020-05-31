@@ -14,11 +14,12 @@
 // limitations under the License.
 //
 
+#include "examples/cc/animals_and_carrots.h"
+
 #include "absl/flags/flag.h"
 #include "absl/strings/str_format.h"
 #include "differential_privacy/algorithms/confidence-interval.pb.h"
 #include "differential_privacy/algorithms/util.h"
-#include "differential_privacy/example/animals_and_carrots.h"
 #include "differential_privacy/proto/data.pb.h"
 #include "differential_privacy/proto/util.h"
 
@@ -32,7 +33,7 @@ using differential_privacy::example::CarrotReporter;
 using differential_privacy::base::StatusOr;
 
 ABSL_FLAG(std::string, CarrotsDataFile,
-          "differential_privacy/example/animals_and_carrots.csv",
+          "examples/cc/animals_and_carrots.csv",
           "Path to the datafile where the data is stored on the number of "
           "carrots each animal has eaten.");
 
